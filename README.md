@@ -11,12 +11,10 @@ See the following websites:
 Using conda, do the following:
 
 ~~~~
-conda create --name folk-rnn python=2.7
+conda create --name folk-rnn -y python=2.7 mkl mkl-service nose numpy pygpu scipy theano
 conda activate folk-rnn
-conda install mkl-service
-pip install --upgrade https://github.com/Theano/Theano/archive/master.zip
 pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
-git clone https://github.com/IraKorshunova/folk-rnn.git
+git clone https://github.com/JamesOwers/folk-rnn.git
 cd folk-rnn
 ~~~~
 
@@ -29,6 +27,32 @@ To train a new model:
 ~~~~
 python train_rnn.py config5 data/data_v2
 ~~~~
+
+Configuring and testing the GPU. These links were helpful:
+https://groups.google.com/g/theano-users/c/2oTUuKtKylE/m/MD8uhH3JAwAJ
+http://deeplearning.net/software/theano/tutorial/using_gpu.html#testing-the-gpu
+
+```bash
+# Change the versions
+CUDA_DIRPATH="/opt"  # where your installed cuda and cudnn directories live
+CUDA_VERSION="8.0.44"
+CUDNN_VERSION="7.6.0.64_9.2"
+
+# These could go in .bashrc and/or .theanorc
+CUDA_HOME="${CUDA_DIRPATH}/cuda-${CUDA_VERSION}"
+CUDA_LIBRARY_PATH="${CUDA_HOME}/lib64"
+
+CUDNN_HOME="${CUDA_DIRPATH}/cuDNN-${CUDNN_VERSION}"
+CUDNN_LIBRARY_PATH="${CUDNN_HOME}/lib64"
+CUDNN_INCLUDE_PATH="${CUDNN_HOME}/include"
+CUDNN_FLAGS="dnn.library_path=$CUDNN_LIBRARY_PATH,dnn.include_path=$CUDNN_INCLUDE_PATH"
+
+export PATH="${CUDA_HOME}/bin:${PATH}"
+export LD_LIBRARY_PATH="${CUDA_LIBRARY_PATH}:${CUDNN_LIBRARY_PATH}"
+export THEANO_FLAGS="device=cuda,floatX=float64,${CUDNN_FLAGS}"
+
+python test_gpu.py
+```
 
 This code was used for the following published works:
 
